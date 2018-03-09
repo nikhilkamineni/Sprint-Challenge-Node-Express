@@ -26,11 +26,10 @@ server.get('/current', (req, res) => {
 server.get('/compare', (req, res) => {
   getCurrentValue()
     .then(value => {
-      getYestValue(value)
-        .then(values => {
-          res.status(200);
-          res.send(values);
-      })
+      getYestValue(value).then(values => {
+        res.status(200);
+        res.send(values);
+      });
     })
     .catch(err => {
       res.status(422);
@@ -59,19 +58,23 @@ function getYestValue(current) {
       .then(res => res.bpi)
       .then(bpi => {
         const yestValue = Object.values(bpi)[0];
-        const change = current - yestValue;
         const response = {
-          current: current,
-          yesterday: yestValue,
-          change: change
+          change: getChangeStatus(current, yestValue),
+          current: `$${current} USD`,
+          yesterday: `$${yestValue} USD`
         };
-
         resolve(response);
       })
       .catch(err => {
         reject(err);
-      })
+      });
   });
+}
+
+function getChangeStatus(current, yest) {
+  if (current > yest) return `Price has risen by $${current - yest} USD`;
+  if (current < yest) return `Price has fallen by $${yest - current} USD`;
+  if (current === yest) return `Wow, the price has not changed.`;
 }
 
 server.listen(PORT, err => {
