@@ -1,6 +1,8 @@
 const express = require('express');
+const fetch = require('node-fetch');
 const router = express.Router();
 const { getCurrentValue, getYestValue } = require('../models/bpi-compare.js')
+const URL_CURRENT = 'https://api.coindesk.com/v1/bpi/currentprice.json';
 
 router.get('/current', (req, res) => {
   fetch(URL_CURRENT)
